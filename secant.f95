@@ -12,6 +12,7 @@ implicit none
 
 real :: x1, x2, xr
 real :: error, f
+real :: start, finish
 integer :: i
 character(len=20) :: info
 character(len=30) :: fmt
@@ -29,6 +30,7 @@ fmt = "(a12,a13,a13,a13,a25)"
 write (*,*) ""
 write(*,fmt)"ITER","X[xr]","F(X)","INFO","ERROR"
 ! Start root calculation
+call cpu_time(start)
 error = 1e-7
 i = 1
 open(unit=1, file='secant.txt',status='replace')
@@ -55,6 +57,8 @@ open(unit=1, file='secant.txt',status='replace')
         write (1,*) i, xr, f(xr),info, abs((x2-x1)/x1)
     end do
 close(1)
+call cpu_time(finish)
+print '("Time = ",f6.3," seconds.")',finish-start
 end program
 
 function f(x)
