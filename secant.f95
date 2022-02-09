@@ -13,8 +13,7 @@ implicit none
 real :: xi, xf, xr
 real :: error, f
 real :: start, finish
-integer :: i
-character(len=20) :: info
+integer :: i, info
 character(len=30) :: fmt
 write(*,*)""
 write(*,*)"---------------------------------"
@@ -34,24 +33,24 @@ call cpu_time(start)
 error = 1e-7
 i = 1
 open(unit=1, file='secant.txt',status='replace')
-    info = "Not Convergence"
+    info = 0 ! not convergence
     do while (abs((xf-xi)/xf) > error)
         ! calculate the root
         xr = xf - ((f(xf)*(xf-xi))/(f(xf)-f(xi)))
 
         ! Write the result on terimnal display and save it to file
-        write (*,*) i, xr, f(xr),info, abs((xf-xi)/xf)
-        write (1,*) i, xr, f(xr),info, abs((xf-xi)/xf)
-        
+        write (*,*) i, xr, f(xr),info, abs((xf-xi)/xf)*100
+        write (1,*) i, xr, f(xr),info, abs((xf-xi)/xf)*100
+
         if (isnan(xr) .or. (f(xr) > huge(f(xr))) .or. isnan(f(xr))) then
             xi = xf
             xf = xr
             i = i + 1
         else  
             if (abs(f(xr)) < error) then
-                info = "Convergence"
+                info = 1 ! convergence
             else
-                info = "Not Convergence"
+                info = 0 ! not convergence
             end if
             xi = xf
             xf = xr
@@ -60,7 +59,7 @@ open(unit=1, file='secant.txt',status='replace')
     end do
 close(1)
 call cpu_time(finish)
-print '("Time = ",f6.3," seconds.")',finish-start
+print '("Time = ",f12.8," seconds.")',finish-start
 end program
 
 function f(x)
