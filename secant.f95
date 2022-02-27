@@ -11,10 +11,10 @@ program secant
 implicit none
 
 real :: xi, xf, xr
-real :: error, f
+real :: limiterror, f, error
 real :: start, finish
 integer :: i, info
-character(len=30) :: fmt
+character(len=50) :: fmt
 write(*,*)""
 write(*,*)"---------------------------------"
 write(*,*)"SECANT METHOD - FINDING ROOT"
@@ -25,37 +25,47 @@ read *, xi
 write (*,"(a)",advance='no') "Final xr, xf:"
 read*, xf
 
-fmt = "(a12,a13,a13,a13,a25)"
+fmt = "(a12,a13,a13,a15,a20,a15,a13,a18,a25)"
 write (*,*) ""
-write(*,fmt)"ITER","X[xr]","F(X)","INFO","ERROR"
+write(*,fmt)"ITER","Xi", "Xf", "F(Xi)", "F(Xf)", "XR[ROOT]","F(Xr)","INFO","ERROR"
 ! Start root calculation
 call cpu_time(start)
-error = 1e-7
+limiterror = 1e-5
 i = 1
 open(unit=1, file='secant.txt',status='replace')
     info = 0 ! not convergence
-    do while (abs((xf-xi)/xf) > error)
+    do while (abs((xf-xi)/xf)*100 > limiterror)
         ! calculate the root
         xr = xf - ((f(xf)*(xf-xi))/(f(xf)-f(xi)))
 
-        ! Write the result on terimnal display and save it to file
-        write (*,*) i, xr, f(xr),info, abs((xf-xi)/xf)*100
-        write (1,*) i, xr, f(xr),info, abs((xf-xi)/xf)*100
-
-        if (isnan(xr) .or. (f(xr) > huge(f(xr))) .or. isnan(f(xr))) then
-            xi = xf
-            xf = xr
-            i = i + 1
-        else  
-            if (abs(f(xr)) < error) then
-                info = 1 ! convergence
-            else
-                info = 0 ! not convergence
-            end if
-            xi = xf
-            xf = xr
-            i = i + 1
+        ! Check the convergency
+        if (abs(f(xr)) < limiterror) then
+            info = 1 ! convergence
+        else
+            info = 0 ! not convergence
         end if
+
+        ! Shift value
+        xi = xf
+        xf = xr
+
+        ! Calculate error
+        if (xr == 0) then
+            error = 100
+        else
+            error = abs((xr-xi)/xr)*100
+        end if
+
+        ! Stop the process if the final boundary is infinity
+        if (xf > huge(xf)) then
+            exit
+        end if
+
+        ! Write the result on terimnal display and save it to file
+        write (*,*) i, xi, xf, f(xi), f(xf), xr, f(xr),info, error
+        write (1,*) i, xi, xf, f(xi), f(xf), xr, f(xr),info, error
+
+        i = i + 1
     end do
 close(1)
 call cpu_time(finish)
@@ -67,4 +77,5 @@ implicit none
 real :: x, f
 f = (x**2) - (2*x) + 1
 ! f = (x**3) + (3*(x**2)) + (3*x) + 1
+! f = x-exp(-x/3)
 end function
