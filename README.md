@@ -15,7 +15,7 @@ The Secant Method is started by using two initial roots approximation `x1` and `
 # Example
 Given a function of f(x) = x2-2x+1. By using Secant Method, set two initial roots approximation `x1=3` and `x2=4`, where both initial are not in range of root of f(x). As we know, the root of this function is 1 by analytical process.
 
-After 20 times iteration, the root of f(x) = x2 – 2x + 1 by using Secant Method is x = 1.00027132 (precision in Fortran) where the f(x) = 1.9209290e-7 (close to 0).
+After 19 times iteration, the root of f(x) = x2 – 2x + 1 by using Secant Method is x = 1.00027132 (precision in Fortran) where the f(x) = 1.9209290e-7 (close to 0).
 # Contact
 email: auliakhalqillah.mail@gmail.com
 # Material Source
